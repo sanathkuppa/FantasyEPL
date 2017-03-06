@@ -3,34 +3,22 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.keys import Keys
 
 
-# Go to the required webpage and login
+# Go to the required webpage 
 driver = webdriver.Chrome("C:/Python/chromedriver.exe")
-driver.get('https://fantasy.premierleague.com/')
-
-username = driver.find_element_by_name('login')
-password = driver.find_element_by_name('password')
-username.send_keys("mathprofessor92@gmail.com")
-password.send_keys("1123581321")
-
-submit   = driver.find_element_by_xpath("//button[@type='submit']")
-submit.click()
-
-
-driver.implicitly_wait(10) # seconds
-# Go to the transfers page
-#driver.get('https://fantasy.premierleague.com/a/squad/transfers')
 driver.get('https://fantasy.premierleague.com/a/statistics/total_points')
+driver.implicitly_wait(10) # seconds
 
 try:
     element = WebDriverWait(driver, 10).until(
-#        EC.presence_of_element_located((By.XPATH, u"//a[@title='View player information']"))
         EC.presence_of_element_located((By.XPATH, u"//*[@id='ismr-main']/div/div[1]/table/tbody/tr[1]/td[1]/a"))
         
     )
     element.click()
 
+    # Get the main attributes for the first player - Should be made neat later 
     name = driver.find_element_by_class_name('ism-eiw-heading')
     print(name.text) # Player name
     club = driver.find_element_by_xpath("//*[@id='ismr-element']/div/div[2]/div[1]/div[1]/div/div[2]/div[1]/div[1]")
@@ -55,29 +43,32 @@ try:
     print(Threat.text)
     ICT = driver.find_element_by_xpath("//*[@id='ismr-element']/div/div[2]/div[1]/div[1]/ul[2]/li[4]/div")
     print(ICT.text)
+
+    # Main Data for the first player
     DataTable = driver.find_element_by_xpath("//*[@id='ismr-element-history-this']/div/div/table")
     TableRows = DataTable.find_elements_by_xpath("//*[@id='ismr-element-history-this']/div/div/table/tbody/tr")
     print(len(TableRows))
-    
-    for i in range(len(TableRows)):
-        TableCols = driver.find_elements_by_xpath("//*[@id='ismr-element-history-this']/div/div/table/tbody/tr["+str(i+1)+"]/td")
-        print(len(TableCols))
-        for j in range(len(TableCols)):
-            TableElem = driver.find_element_by_xpath("//*[@id='ismr-element-history-this']/div/div/table/tbody/tr["+str(i+1)+"]/td["+str(j+1)+"]")
-            print(TableElem.text)
-    
-    
+
+    # Printing the main data for the first player
+##    for i in range(len(TableRows)):
+##        TableCols = driver.find_elements_by_xpath("//*[@id='ismr-element-history-this']/div/div/table/tbody/tr["+str(i+1)+"]/td")
+##        print(len(TableCols))
+##        for j in range(len(TableCols)):
+##            TableElem = driver.find_element_by_xpath("//*[@id='ismr-element-history-this']/div/div/table/tbody/tr["+str(i+1)+"]/td["+str(j+1)+"]")
+##            print(TableElem.text)
+
+    # Close the first player's dialog
+    close = driver.find_element_by_xpath('//*[@id="ismr-element"]/div/div[1]/a')
+    close.click()
+
+    # Get all the players in the 1st page and print their names. Should modify the loop below so that it extract the other information as well and stores in a table
+    players = driver.find_elements_by_xpath("//*[@id='ismr-main']/div/div[1]/table/tbody/tr")
+    for i in range(len(players)):
+        Button = driver.find_element_by_xpath("//*[@id='ismr-main']/div/div[1]/table/tbody/tr["+str(i+1)+"]/td[1]/a")
+        Button.click()
+        name = driver.find_element_by_class_name('ism-eiw-heading')
+        print(name.text) # Player name
+        close = driver.find_element_by_xpath('//*[@id="ismr-element"]/div/div[1]/a')
+        close.click()
 finally:
     print("blah")
-
-#try:
-#    element = WebDriverWait(driver, 10).until(
-#        EC.presence_of_element_located((By.XPATH, u"//*[@id='ismjs-element-filter']"))
-#    )
-#finally:
-#    print("blah")
-
-#view = driver.find_element_by_xpath("//*[@id='ismjs-element-filter']")
-#view = driver.find_element_by_xpath("//optgroup[@label='Global']")
-#view.click()
-#view.send_keys(Keys.ARROW_DOWN)
