@@ -54,12 +54,12 @@ def read_data(driver) :
         count = 0
         # Get all the players in the 1st page and print their names. Should modify the loop below so that it extract the other information as well and stores in a table
         players = driver.find_elements_by_xpath("//*[@id='ismr-main']/div/div[1]/table/tbody/tr")
-        #for pno in range(len(players)):
-        for pno in range(8):
+        for pno in range(len(players)):
+        #for pno in [22]:
             Button = driver.find_element_by_xpath("//*[@id='ismr-main']/div/div[1]/table/tbody/tr["+str(pno+1)+"]/td[1]/a")
             Button.click()
             name = driver.find_element_by_xpath('//*[@id="ismjs-dialog-title"]')
-            StatusExists = len(driver.find_elements_by_class_name("ism-el-status-bar--0")) #Check if a player is suspended or injured. Change the xpath accordingly
+            StatusExists = len(driver.find_elements_by_class_name("ism-element-status-bar__content")) #Check if a player is suspended or injured. Change the xpath accordingly
             pdata = [driver.find_element_by_xpath(value[0]+str(value[1]+StatusExists)+value[2]).text.encode('ascii', 'ignore') for key, value in XPATH.items()]
 
             DataTable = driver.find_element_by_xpath("//*[@id='ismr-element-history-this']/div/div/table")
@@ -70,8 +70,11 @@ def read_data(driver) :
                 mdata= [pno] + [TableRow.find_element_by_xpath("//*[@id='ismr-element-history-this']/div/div/table/tbody/tr["+str(row+1)+"]/td["+str(col+1)+"]").text.encode('ascii', 'ignore') for col in range(len(TableCols))]
                 df.loc[count] = pdata + mdata
                 count += 1
+            logger.info("Printed %d rows for %s", len(TableRows),name.text)
             close = driver.find_element_by_xpath('//*[@id="ismr-element"]/div/div[1]/a')
-            close.click()        
+            close.click()
+
+
     finally:
         return df
 
